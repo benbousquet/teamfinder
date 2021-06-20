@@ -1,9 +1,12 @@
-import express from "express";
+import express, { json } from "express";
 import pool from "./database";
 
 const app = express();
 const router = express.Router();
 const port = 3000;
+
+// middleware
+app.use(json());
 
 // run db migration
 pool
@@ -28,15 +31,40 @@ router.get("/getAllOpenRequests", (req, res) => {
       `
     select * from request 
     where (
-	    player1 is not null 
-	    or player2 is not null 
-	    or player3 is not null
+	    player1 is null 
+	    or player2 is null 
+	    or player3 is null
     )`
     )
     .then((dbres) => {
-      res.send(dbres.rows[0]);
+      if (dbres.rows == null) {
+        res.send({});
+      } else {
+        res.send(dbres.rows);
+        console.log(dbres.rows);
+      }
     })
     .catch((e) => console.error(e.stack));
+});
+
+router.post("/createRequest", (req, res) => {
+  let { creator } = req.body;
+
+  pool
+    .query(
+      `
+    insert into request(creator, created_on)
+    values ($1::text, NOW())
+    `,
+      [creator]
+    )
+    .then((dbres) => {
+      res.status(201).send({ message: "success" });
+    })
+    .catch((e) => {
+      console.error(e.stack);
+      res.send({ error: e.stack });
+    });
 });
 
 app.use("/api", router);

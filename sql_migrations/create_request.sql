@@ -1,6 +1,3 @@
-insert into requests 
-values ($1, $2, $3, $4)
+insert into request(creator, created_on) 
+values ($1, NOW())
 -- $1 creator
--- $2 player1
--- $3 player2
--- $4 player3
