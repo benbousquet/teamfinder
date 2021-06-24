@@ -1,5 +1,6 @@
 import express, { json } from "express";
 import pool from "./database";
+import cors from "cors";
 
 const app = express();
 const router = express.Router();
@@ -7,6 +8,7 @@ const port = 3001;
 
 // middleware
 app.use(json());
+app.use(cors());
 
 // run db migration
 pool
